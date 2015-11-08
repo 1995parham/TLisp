@@ -6,7 +6,8 @@
 #
 # [] Created By : Parham Alvani (parham.alvani@gmail.com)
 # =======================================
-add_executable(TLisp.out main.c cell.c)
+add_executable(TLisp.out main.c tlisp_cell.c tlisp_cell.h)
+
 
 # Add personal c flags
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -O0 -g -std=gnu11 ")

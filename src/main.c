@@ -11,9 +11,16 @@
 /*
  * Copyright (c) 2015 Parham Alvani.
 */
-#include "cell.h"
+#include "tlisp_cell.h"
+#include <stdlib.h>
+#include <stdio.h>
 
 int main(int argc, char *argv[])
 {
-	cdr(cons(atom(30), cons(atom(10), atom(20))));
+	struct tlisp_cell *lst = tlisp_list(
+		tlisp_atom(10), tlisp_atom(20), tlisp_atom(30));
+	tlisp_car(lst);
+	printf("\n");
+	tlisp_cdr(lst);
+	printf("\n");
 }
