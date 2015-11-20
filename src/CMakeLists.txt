@@ -6,7 +6,7 @@
 #
 # [] Created By : Parham Alvani (parham.alvani@gmail.com)
 # =======================================
-add_executable(TLisp.out main.c tlisp_cell.c tlisp_cell.h)
+add_executable(TLisp.out main.c tlisp_cell.c tlisp_cell.h tlisp_select.h tlisp_select.c)
 
 
 # Add personal c flags

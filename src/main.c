@@ -12,13 +12,20 @@
  * Copyright (c) 2015 Parham Alvani.
 */
 #include "tlisp_cell.h"
+#include "tlisp_select.h"
 #include <stdlib.h>
 #include <stdio.h>
 
 int main(int argc, char *argv[])
 {
+	struct tlisp_cell *x = tlisp_atom(10);
 	struct tlisp_cell *lst = tlisp_list(
-		tlisp_atom(10), tlisp_atom(20), tlisp_atom(30));
+		x, tlisp_atom(20), tlisp_atom(30));
+	tlisp_car(lst);
+	printf("\n");
+	tlisp_cdr(lst);
+	printf("\n");
+	lst = select_1(x, lst);
 	tlisp_car(lst);
 	printf("\n");
 	tlisp_cdr(lst);
