@@ -21,13 +21,11 @@ int main(int argc, char *argv[])
 	struct tlisp_cell *x = tlisp_atom(10);
 	struct tlisp_cell *lst = tlisp_list(
 		x, tlisp_atom(20), tlisp_atom(30));
-	tlisp_car(lst);
+	tlisp_print(lst);
 	printf("\n");
-	tlisp_cdr(lst);
+	lst = select_2(x, lst);
+	tlisp_print(lst);
 	printf("\n");
-	lst = select_1(x, lst);
-	tlisp_car(lst);
-	printf("\n");
-	tlisp_cdr(lst);
-	printf("\n");
+	tlisp_chain_free(lst);
+	tlisp_chain_free(x);
 }

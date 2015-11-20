@@ -23,47 +23,97 @@ struct tlisp_cell *tlisp_cons(struct tlisp_cell *c1, struct tlisp_cell *c2)
 	new->car = c1;
 	new->cdr = c2;
 	new->is_atom = 0;
+	new->ref_count = 0;
+	c1->ref_count++;
+	c2->ref_count++;
 	return new;
 }
 
-void tlisp_cdr(const struct tlisp_cell *c)
+void tlisp_chain_free(struct tlisp_cell *c)
 {
-	if (!c->cdr) {
+	if (c->ref_count > 0) {
 		return;
-	} else if (c->cdr->is_atom) {
-		printf("%d", c->cdr->value);
+	}
+	if (!c->is_atom) {
+		if (c->cdr) {
+			c->cdr->ref_count--;
+			tlisp_chain_free(c->cdr);
+		}
+		if (c->car) {
+			c->car->ref_count--;
+			tlisp_chain_free(c->car);
+		}
+	}
+	free(c);
+}
+
+void tlisp_free(struct tlisp_cell *c)
+{
+	if (c->ref_count > 0) {
+		return;
+	}
+	if (!c->is_atom) {
+		if (c->cdr) {
+			c->cdr->ref_count--;
+		}
+		if (c->car) {
+			c->car->ref_count--;
+		}
+	}
+	free(c);
+}
+
+void tlisp_print(const struct tlisp_cell *c)
+{
+	if (c->is_atom) {
+		printf("%lld", c->value);
 	} else {
 		printf("(");
-		tlisp_car(c->cdr);
+		tlisp_car_print(c);
 		printf(", ");
-		tlisp_cdr(c->cdr);
+		tlisp_cdr_print(c);
 		printf(")");
 	}
 }
 
-struct tlisp_cell *tlisp_atom(int value)
+void tlisp_cdr_print(const struct tlisp_cell *c)
+{
+	if (!c->cdr) {
+		printf("NULL");
+	} else if (c->cdr->is_atom) {
+		printf("%lld", c->cdr->value);
+	} else {
+		printf("(");
+		tlisp_car_print(c->cdr);
+		printf(", ");
+		tlisp_cdr_print(c->cdr);
+		printf(")");
+	}
+}
+
+struct tlisp_cell *tlisp_atom(uint64_t value)
 {
 	struct tlisp_cell *new;
 
 	new = (struct tlisp_cell *) malloc(sizeof(struct tlisp_cell));
 	new->value = value;
 	new->cdr = NULL;
-	new->car = NULL;
+	new->ref_count = 0;
 	new->is_atom = 1;
 	return new;
 }
 
-void tlisp_car(const struct tlisp_cell *c)
+void tlisp_car_print(const struct tlisp_cell *c)
 {
 	if (!c->car) {
-		return;
+		printf("NULL");
 	} else if (c->car->is_atom) {
-		printf("%d", c->car->value);
+		printf("%lld", c->car->value);
 	} else {
 		printf("(");
-		tlisp_car(c->car);
+		tlisp_car_print(c->car);
 		printf(", ");
-		tlisp_cdr(c->car);
+		tlisp_cdr_print(c->car);
 		printf(")");
 	}
 }
@@ -74,12 +124,15 @@ struct tlisp_cell *_tlisp_list(struct tlisp_cell **cs)
 
 	base = (struct tlisp_cell *) malloc(sizeof(struct tlisp_cell));
 	it = base;
+	it->ref_count = 0;
 	while (*cs != NULL) {
 		it->car = *cs;
+		(*cs)->ref_count++;
 		it->is_atom = 0;
 		if (*(cs + 1)) {
 			it->cdr = (struct tlisp_cell *) malloc(
 				sizeof(struct tlisp_cell));
+			it->cdr->ref_count = 1;
 			it = it->cdr;
 		} else {
 			it->cdr = NULL;
